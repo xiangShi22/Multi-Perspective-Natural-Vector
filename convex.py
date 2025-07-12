@@ -3,7 +3,6 @@ from scipy.optimize import linprog
 import os
 import pandas as pd
 
-
 def intersection(mutset0, mutset00):
     m, l1 = mutset0.shape
     n, l2 = mutset00.shape
@@ -28,12 +27,8 @@ def intersection(mutset0, mutset00):
     else:
         return 1
 
-
 # Specify the folder path
-path = '/covid/52mnv'  # Replace with the actual folder path
-
-# Store all vectors in a list
-all_vectors = []
+path = '/covid/52mnv' 
 
 # Initialize a list to store intersection results
 results = []
@@ -51,7 +46,7 @@ for i, filename1 in enumerate(files):
         df1 = pd.read_csv(file_path1)
         
         # Check if the number of sequences is at least 3
-        if len(df1) < 5:
+        if len(df1) < 3:
             continue
         
         cluster_count += 1
@@ -67,7 +62,7 @@ for i, filename1 in enumerate(files):
                 df2 = pd.read_csv(file_path2)
                 
                 # Check if the number of sequences is at least 3
-                if len(df2) < 5:
+                if len(df2) < 3:
                     continue
                 
                 vectors2 = df2.values
