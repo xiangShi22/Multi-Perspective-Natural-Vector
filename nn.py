@@ -6,7 +6,6 @@ import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
-from imblearn.over_sampling import SMOTE
 import os
 from sklearn.metrics import classification_report, accuracy_score
 
