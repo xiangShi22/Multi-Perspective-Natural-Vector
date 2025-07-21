@@ -44,7 +44,7 @@ class WeightedNeuralNetwork(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Folder path
-folder_path = "/home/shixiang/shixiang/multiview/covid_ncbi/2mer"
+folder_path = "/covid_ncbi/2mer"
 
 # Get all CSV file paths
 csv_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.csv')]
@@ -66,10 +66,6 @@ data = pd.concat(data_list, axis=0)
 # Separate features and labels
 X = data.iloc[:, :-1].values  # All columns except the last one are features
 y = data.iloc[:, -1].values   # The last column is the label
-
-# Oversampling using SMOTE (commented out)
-oversampler = SMOTE(random_state=42)
-X_resampled, y_resampled = oversampler.fit_resample(X, y)
 
 # Undersampling
 undersampler = RandomUnderSampler(sampling_strategy='auto', random_state=10)
