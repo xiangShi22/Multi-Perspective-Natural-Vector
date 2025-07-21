@@ -40,11 +40,8 @@ y = label_encoder.fit_transform(y)
 # Print data dimensions before SMOTE
 print(f"Original X shape: {X.shape}, y shape: {y.shape}")
 
-# Handle class imbalance: Apply SMOTE oversampling
-# smote = SMOTE(sampling_strategy='auto', random_state=42)
-# X_resampled, y_resampled = smote.fit_resample(X, y)
-X_resampled, y_resampled = X, y
-# Print data dimensions after SMOTE
+undersampler = RandomUnderSampler(sampling_strategy='auto', random_state=10)
+X_resampled, y_resampled = undersampler.fit_resample(X, y)
 print(f"Resampled X shape: {X_resampled.shape}, y_resampled shape: {y_resampled.shape}")
 
 # Verify consistent sample count
