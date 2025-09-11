@@ -3,13 +3,12 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
-from imblearn.under_sampling import RandomUnderSampler
 import os
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.model_selection import StratifiedKFold
 
-# Define neural network (remove logic related to factor_size)
+# Define neural network 
 class WeightedNeuralNetwork(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, min_weight_value=1e-5):
         super(WeightedNeuralNetwork, self).__init__()
@@ -21,7 +20,7 @@ class WeightedNeuralNetwork(nn.Module):
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(hidden_dim, hidden_dim // 2)
         self.fc3 = nn.Linear(hidden_dim // 2, output_dim)
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.3)
 
     def forward(self, x):
         weighted_input = x * self.weights  
@@ -43,7 +42,7 @@ class WeightedNeuralNetwork(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Folder path
-folder_path = "/covid_ncbi/2mer"
+folder_path = "/embeddings/poliovirus/2mer"
 
 # Get all CSV file paths
 csv_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.csv')]
@@ -64,9 +63,9 @@ data = pd.concat(data_list, axis=0)
 
 # Separate features and labels
 X = data.iloc[:, :-1].values  # All columns except the last one are features
-y = data.iloc[:, -1].values   # The last column is the label
+y = data.iloc[:, -1].values  # The last column is the label
 
-# Undersampling
+# # Undersampling
 undersampler = RandomUnderSampler(sampling_strategy='auto', random_state=10)
 X_resampled, y_resampled = undersampler.fit_resample(X, y)
 
@@ -81,7 +80,7 @@ X_resampled = torch.tensor(X_resampled, dtype=torch.float32).to(device)
 y_resampled = torch.tensor(y_resampled, dtype=torch.long).to(device)
 
 input_dim = X_resampled.shape[1]
-hidden_dim = 512 
+hidden_dim = 128
 output_dim = len(np.unique(y_resampled.cpu()))  
 
 model = WeightedNeuralNetwork(input_dim, hidden_dim, output_dim).to(device)
@@ -92,16 +91,18 @@ class_weights = 1.0 / class_counts
 loss_weights = class_weights.float().to(device)
 criterion = nn.CrossEntropyLoss(weight=loss_weights)
 
-optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-5)
 
 # 5-fold cross-validation
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
+kf = StratifiedKFold(n_splits=5, shuffle=True)
 
 total_accuracy = 0  
 
-for fold, (train_index, val_index) in enumerate(kf.split(X_resampled)):
+for fold, (train_index, val_index) in enumerate(kf.split(X_resampled.cpu(), y_resampled.cpu())):
     print(f"\nFold {fold+1}/{5}")
-    
+
+    model = WeightedNeuralNetwork(input_dim, hidden_dim, output_dim).to(device)
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-6)
+
     # Split training and validation sets
     X_train, X_val = X_resampled[train_index], X_resampled[val_index]
     y_train, y_val = y_resampled[train_index], y_resampled[val_index]
@@ -126,11 +127,24 @@ for fold, (train_index, val_index) in enumerate(kf.split(X_resampled)):
     with torch.no_grad():
         outputs = model(X_val)
         _, predicted = torch.max(outputs, 1)
-        accuracy = accuracy_score(y_val.cpu(), predicted.cpu())
+
+        y_val_cpu = y_val.cpu().numpy()
+        predicted_cpu = predicted.cpu().numpy()
+        
+        unique_classes = np.unique(y_val_cpu)
+        print("\n--- Correctly Classified Samples per Class ---")
+        for cls in unique_classes:
+            class_indices = np.where(y_val_cpu == cls)[0]
+            correct_predictions = np.sum(predicted_cpu[class_indices] == cls)
+            total_samples = len(class_indices)
+            
+            print(f"Class {cls}: {correct_predictions} / {total_samples}")
+
+        accuracy = accuracy_score(y_val_cpu, predicted_cpu)
         total_accuracy += accuracy  # Accumulate accuracy
     
     print(f"Validation Accuracy for Fold {fold+1}: {accuracy:.4f}")
-    print(f"Classification Report for Fold {fold+1}:\n{classification_report(y_val.cpu(), predicted.cpu())}")
+    print(f"Classification Report for Fold {fold+1}:\n{classification_report(y_val.cpu(), predicted.cpu(), digits=4)}")
     
 # Compute and print average accuracy
 average_accuracy = total_accuracy / 5
