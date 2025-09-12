@@ -41,7 +41,7 @@ ari = adjusted_rand_score(y, cluster_labels) if len(set(cluster_labels)) > 1 els
 nmi = normalized_mutual_info_score(y, cluster_labels) if len(set(cluster_labels)) > 1 else -1
 fmi = fowlkes_mallows_score(y, cluster_labels) if len(set(cluster_labels)) > 1 else -1
 
-print('\n聚类性能：')
+print('\nResults：')
 print(f"Silhouette Score: {ss:.4f}")
 print(f"Calinski-Harabasz Score: {chs:.4f}")
 print(f"Davies-Bouldin Score: {dbs:.4f}")
