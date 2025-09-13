@@ -28,7 +28,7 @@ def intersection(mutset0, mutset00):
         return 1
 
 # Specify the folder path
-path = '/covid/52mnv' 
+path = '/embeddings/poliovirus/28mnv'
 
 # Initialize a list to store intersection results
 results = []
