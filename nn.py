@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 import os
 from sklearn.metrics import classification_report, accuracy_score
+from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import StratifiedKFold
 
 # Define neural network 
@@ -42,7 +43,7 @@ class WeightedNeuralNetwork(nn.Module):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Folder path
-folder_path = "/embeddings/poliovirus/2mer"
+folder_path = "/embeddings/covid/2mer"
 
 # Get all CSV file paths
 csv_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.csv')]
@@ -80,7 +81,7 @@ X_resampled = torch.tensor(X_resampled, dtype=torch.float32).to(device)
 y_resampled = torch.tensor(y_resampled, dtype=torch.long).to(device)
 
 input_dim = X_resampled.shape[1]
-hidden_dim = 128
+hidden_dim = 256
 output_dim = len(np.unique(y_resampled.cpu()))  
 
 model = WeightedNeuralNetwork(input_dim, hidden_dim, output_dim).to(device)
