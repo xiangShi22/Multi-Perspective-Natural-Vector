@@ -5,13 +5,26 @@ MNV is a rapid alignment-free toolkit for viral sequence classification and clus
 The rapid expansion of biological data in recent decades has highlighted the need for efficient methods in sequence analysis. Traditional pairwise alignment approaches are both time-consuming and memory-intensive. Alignment-free methods such as Natural Vector and kmer operate on a one-dimensional framework, interpreting DNA primarily as a linear string of nucleotides. To achieve a more comprehensive interpretation of molecular structure, this study incorporates the three-dimensional architectural features of DNA and introduces a novel alignment-free method named Multi-perspective Natural Vector (MNV). The MNV method maps genome sequences of varying lengths to points within a unified geometric space, facilitating large-size data processing tasks such as variant classification and clustering. Across datasets of different sizes and types, MNV attains 100% convex hull separation ratio in lower dimension compared with widely-used methods Natural Vector and kmer methods. In neural network classification, MNV achieves better classification accuracy of 99.55% and 98.78% on SARS-CoV-2 and Poliovirus datasets respectively, demonstrating its effectiveness in viral genome analysis while maintaining computational efficiency.
 
 ## Usage Example
-The file demo.ipynb is a usage example including the following steps:\n
-Step1 Convert the original Poliovirus data to MNV embeddings\n
-Step2 Calculate the convex hull disjoint ratio of MNV embeddings\n
-Step3 Neural network classification\n
-Step4 DBSCAN clustering\n
-Step5 Check if the embeddings in the same subtype repeat\n
-Step6 Shuffle the labels to validate the convex hull results\n
+The file demo.ipynb is a usage example including the following steps:
+
+
+Step1 Convert the original Poliovirus data to MNV embeddings
+
+
+Step2 Calculate the convex hull disjoint ratio of MNV embeddings
+
+
+Step3 Neural network classification
+
+
+Step4 DBSCAN clustering
+
+
+Step5 Check if the embeddings in the same subtype repeat
+
+
+Step6 Shuffle the labels to validate the convex hull results
+
 
 ## Contact Us
 If you have any questions or suggestions, please contact us via email: [shix22@mails.tsinghua.edu.cn]
